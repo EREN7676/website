@@ -12,8 +12,8 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
-    /* Temel Ayarlar */
-    * { box-sizing: border-box; } /* Taşmaları engeller */
+    /* --- CSS TASARIMI BAŞLANGIÇ --- */
+    * { box-sizing: border-box; } 
 
     :root {
       --primary-color: #d4af37; /* Altın */
@@ -125,12 +125,12 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.6); /* Arka planı karart */
+      background: rgba(0, 0, 0, 0.6);
       z-index: 9999;
-      display: flex; /* Flex ile tam ortala */
+      display: flex; /* Görünür olması için flex olmalı */
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(4px); /* Arka planı bulanıklaştır */
+      backdrop-filter: blur(4px);
       animation: fadeIn 0.4s;
     }
 
@@ -201,6 +201,7 @@
       <button class="btn-style" onclick="closeModal()">Tamam, Anladım</button>
     </div>
   </div>
+
   <div class="card">
     <h1>Hilal & Abdurrahman</h1>
     <div class="date">
@@ -244,15 +245,20 @@
   <footer>Hilal & Abdurrahman © 2026</footer>
 
   <script>
-    // --- BURAYA DİKKAT: KENDİ GOOGLE APPS SCRIPT LINKINI TIRNAKLARIN İÇİNE YAPIŞTIR ---
+    
+    // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    // BURAYI MUTLAKA KENDİ GOOGLE APPS SCRIPT LINKINLE DEĞİŞTİR:
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyG-9ozehhttr0j1I7WpEZx6cRQe5VS-97tU5bDPTDzjLkYs2k4DV50ic_wYbOsfCYt/exec"; 
+    // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-    // 1. EKSİK OLAN KAPATMA FONKSİYONU (Bunu ekleyince düzelecek)
+
+    // 1. POP-UP KAPATMA FONKSİYONU
     function closeModal() {
+      // Bu komut, id'si 'infoModal' olan kutuyu gizler
       document.getElementById('infoModal').style.display = 'none';
     }
 
-    // 2. DOSYA YÜKLEME FONKSİYONU
+    // 2. DOSYA SEÇİLİNCE ÇALIŞAN FONKSİYON
     function dosyalariYukle(input) {
       var files = input.files;
       if (files.length === 0) return;
@@ -263,7 +269,7 @@
       var total = files.length;
       var count = 0;
 
-      // Seçilen tüm dosyaları döngüye al
+      // Dosyaları teker teker gönder
       Array.from(files).forEach(file => {
         okuVeGonder(file, function(basarili) {
           count++;
@@ -280,7 +286,7 @@
       });
     }
 
-    // 3. OKUMA VE GÖNDERME (Fetch Kullanan Yeni Yöntem)
+    // 3. DOSYAYI OKUYUP GOOGLE'A GÖNDEREN FONKSİYON
     function okuVeGonder(file, callback) {
       var reader = new FileReader();
       reader.onload = function(e) {
@@ -310,7 +316,7 @@
       reader.readAsDataURL(file);
     }
 
-    // 4. KONFETİ EFEKTİ (Eksikse bu da çalışmazdı)
+    // 4. KONFETİ EFEKTİ
     function bitisEfekti() {
       setTimeout(function() {
         document.getElementById('progressArea').style.display = 'none';
@@ -326,7 +332,7 @@
       }, 800);
     }
 
-    // 5. BAŞA DÖNME FONKSİYONU
+    // 5. BAŞA DÖN BUTONU
     function sifirla() {
       document.getElementById('successArea').style.display = 'none';
       document.getElementById('uploadBox').style.display = 'block';
@@ -334,9 +340,6 @@
       document.getElementById('progressFill').style.width = "0%";
       document.getElementById('statusCount').innerText = "0%";
     }
-
   </script>
 </body>
 </html>
-
-
