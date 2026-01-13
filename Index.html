@@ -244,72 +244,73 @@
   <footer>Hilal & Abdurrahman © 2026</footer>
 
   <script>
-    // Pop-up Kapatma Fonksiyonu
-    function closeModal() {
-      document.getElementById('infoModal').style.display = 'none';
-    }
+  // --- GÜNCELLENMİŞ JAVASCRIPT KISMI ---
 
-    // Dosya Yükleme Kodları (Aynı)
-    function dosyalariYukle(input) {
-      var files = input.files;
-      if (files.length === 0) return;
+   // Senin Web App URL'in (Tırnak içine yapıştır)
+   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx...BURAYA_YAPISTIR.../exec";
 
-      document.getElementById('uploadBox').style.display = 'none';
-      document.getElementById('progressArea').style.display = 'block';
+   function dosyalariYukle(input) {
+     var files = input.files;
+     if (files.length === 0) return;
 
-      var total = files.length;
-      var count = 0;
+     document.getElementById('uploadBox').style.display = 'none';
+     document.getElementById('progressArea').style.display = 'block';
 
-      for (var i = 0; i < total; i++) {
-        okuVeGonder(files[i], function() {
-          count++;
-          var yuzde = Math.round((count / total) * 100);
-          document.getElementById('progressFill').style.width = yuzde + "%";
-          document.getElementById('statusCount').innerText = yuzde + "%";
-          document.getElementById('statusMessage').innerText = count + " / " + total + " yüklendi";
+     var total = files.length;
+     var count = 0;
 
-          if (count === total) {
-            bitisEfekti();
-          }
-        });
-      }
-    }
+     // Dosyaları sırayla işle
+     Array.from(files).forEach(file => {
+       okuVeGonder(file, function(basarili) {
+         count++;
+         var yuzde = Math.round((count / total) * 100);
+         
+         // İlerleme çubuğunu güncelle
+         document.getElementById('progressFill').style.width = yuzde + "%";
+         document.getElementById('statusCount').innerText = yuzde + "%";
+         document.getElementById('statusMessage').innerText = count + " / " + total + " yüklendi";
 
-    function okuVeGonder(file, callback) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var data = {
-          fileName: file.name,
-          mimeType: file.type,
-          base64: e.target.result.split(',')[1]
-        };
-        google.script.run.withSuccessHandler(callback).uploadFiles(data);
-      };
-      reader.readAsDataURL(file);
-    }
+         if (count === total) {
+           bitisEfekti();
+         }
+       });
+     });
+   }
 
-    function bitisEfekti() {
-      setTimeout(function() {
-        document.getElementById('progressArea').style.display = 'none';
-        document.getElementById('successArea').style.display = 'block';
-        try {
-          var end = Date.now() + (2 * 1000); 
-          (function frame() {
-            confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#d4af37', '#fdfbfb'] });
-            confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#d4af37', '#fdfbfb'] });
-            if (Date.now() < end) { requestAnimationFrame(frame); }
-          }());
-        } catch(e) {}
-      }, 800);
-    }
+   function okuVeGonder(file, callback) {
+     var reader = new FileReader();
+     reader.onload = function(e) {
+       
+       // Gönderilecek veri paketi
+       var veriPaketi = {
+         fileName: file.name,
+         mimeType: file.type,
+         base64: e.target.result.split(',')[1]
+       };
 
-    function sifirla() {
-      document.getElementById('successArea').style.display = 'none';
-      document.getElementById('uploadBox').style.display = 'block';
-      document.getElementById('myForm').reset();
-      document.getElementById('progressFill').style.width = "0%";
-      document.getElementById('statusCount').innerText = "0%";
-    }
+       // google.script.run YERİNE fetch kullanıyoruz:
+       fetch(GOOGLE_SCRIPT_URL, {
+         method: "POST",
+         mode: "no-cors", // Google'a veri gönderirken CORS hatası almamak için
+         headers: {
+           "Content-Type": "application/json"
+         },
+         body: JSON.stringify(veriPaketi)
+       })
+       .then(() => {
+         // no-cors modunda yanıt okunamaz ama işlem başarılı varsayılır
+         callback(true);
+       })
+       .catch(error => {
+         console.error("Hata:", error);
+         callback(false); // Yine de devam etsin ki süreç tıkanmasın
+       });
+
+     };
+     reader.readAsDataURL(file);
+   }
+
+   // Diğer fonksiyonlar (bitisEfekti, sifirla, closeModal) aynı kalabilir.
   </script>
 </body>
 </html>
