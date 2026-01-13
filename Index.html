@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hilal & Abdurrahman Nişan Hatırası</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Temel Ayarlar */
+    * { box-sizing: border-box; } /* Taşmaları engeller */
+
+    :root {
+      --primary-color: #d4af37; /* Altın */
+      --secondary-color: #fdfbfb;
+      --text-color: #4a4a4a;
+    }
+
+    body {
+      font-family: 'Raleway', sans-serif;
+      background-color: var(--secondary-color);
+      background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png'), linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      background-attachment: fixed;
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: var(--text-color);
+    }
+
+    /* Kart Tasarımı */
+    .card {
+      background: rgba(255, 255, 255, 0.94);
+      padding: 35px 25px;
+      border-radius: 25px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.1), 0 0 20px rgba(212, 175, 55, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3rem;
+      background: -webkit-linear-gradient(#d4af37, #b48811);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0 0 5px 0;
+      line-height: 1.1;
+    }
+
+    .date {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: #888;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      font-weight: 700;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    .date .material-icons-round { font-size: 1rem; color: var(--primary-color); }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    /* Buton Tasarımı */
+    .upload-box { width: 100%; position: relative; margin-bottom: 10px; }
+
+    .btn-style {
+      background: linear-gradient(135deg, #d4af37, #c79f2c);
+      color: white;
+      padding: 15px 10px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+      transition: transform 0.2s;
+    }
+    .btn-style:active { transform: scale(0.98); }
+    input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+
+    /* İlerleme Çubuğu */
+    .progress-area { display: none; margin-top: 20px; text-align: left; }
+    .progress-bar-bg { height: 8px; background: #f0f0f0; border-radius: 10px; overflow: hidden; margin-bottom: 5px; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary-color), #f6e27a); border-radius: 10px; transition: width 0.3s; }
+    .status-text { font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
+
+    /* Başarı Alanı */
+    .success-area { display: none; margin-top: 25px; animation: fadeIn 0.5s; }
+    .success-icon { font-size: 3.5rem; display: block; margin-bottom: 10px; color: var(--primary-color); }
+    
+    .btn-secondary { background: white; border: 2px solid var(--primary-color); color: var(--primary-color); margin-top: 15px; }
+
+    footer { margin-top: 30px; font-size: 0.7rem; color: #a0a0a0; }
+
+    /* --- POP-UP (MODAL) TASARIMI --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6); /* Arka planı karart */
+      z-index: 9999;
+      display: flex; /* Flex ile tam ortala */
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px); /* Arka planı bulanıklaştır */
+      animation: fadeIn 0.4s;
+    }
+
+    .modal-box {
+      background: white;
+      width: 85%;
+      max-width: 350px;
+      padding: 30px 25px;
+      border-radius: 20px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal-box h3 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin: 0 0 15px 0;
+    }
+
+    .modal-box p {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    /* Kapatma (X) Tuşu */
+    .close-icon {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: #aaa;
+      cursor: pointer;
+      transition: color 0.3s;
+      background: #f5f5f5;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-icon:hover { color: #555; }
+
+    /* Animasyonlar */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  </style>
+</head>
+<body>
+
+  <div class="modal-overlay" id="infoModal">
+    <div class="modal-box">
+      <div class="close-icon" onclick="closeModal()">
+        <span class="material-icons-round" style="font-size: 20px;">close</span>
+      </div>
+      
+      <h3>Hoş Geldiniz! 👋</h3>
+      <p>
+        Bu mutlu günümüzde yanımızda olduğunuz için teşekkürler!<br><br>
+        Nişanda çektiğiniz fotoğraf ve videoları bu siteye yükleyerek bizimle paylaşır mısınız? 
+        Böylece anılarımız ölümsüzleşecek. 📸
+      </p>
+      
+      <button class="btn-style" onclick="closeModal()">Tamam, Anladım</button>
+    </div>
+  </div>
+  <div class="card">
+    <h1>Hilal & Abdurrahman</h1>
+    <div class="date">
+      <span class="material-icons-round">event</span>
+      26 OCAK 2026
+    </div>
+
+    <p>Telefonunuzdaki anıları bizimle paylaşmak için aşağıdaki butona tıklayabilirsiniz. 💕</p>
+
+    <form id="myForm">
+      <div class="upload-box" id="uploadBox">
+        <div class="btn-style">
+          <span class="material-icons-round">add_a_photo</span>
+          Fotoğraf & Video Yükle
+        </div>
+        <input type="file" id="fileInput" multiple accept="image/*,video/*" onchange="dosyalariYukle(this)">
+      </div>
+    </form>
+
+    <div class="progress-area" id="progressArea">
+      <div class="progress-bar-bg">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="status-text">
+        <span id="statusMessage">Yükleniyor...</span>
+        <span id="statusCount">0%</span>
+      </div>
+    </div>
+
+    <div class="success-area" id="successArea">
+      <span class="material-icons-round success-icon">check_circle</span>
+      <h3 style="color: #d4af37; font-size: 1.5rem; margin:0;">Harika!</h3>
+      <p style="margin:5px 0 0 0; font-size:0.9rem;">Anılarınız bize ulaştı.</p>
+      <button class="btn-style btn-secondary" onclick="sifirla()">
+        <span class="material-icons-round">replay</span>
+        Daha Fazla Yükle
+      </button>
+    </div>
+  </div>
+  
+  <footer>Hilal & Abdurrahman © 2026</footer>
+
+  <script>
+    // Pop-up Kapatma Fonksiyonu
+    function closeModal() {
+      document.getElementById('infoModal').style.display = 'none';
+    }
+
+    // Dosya Yükleme Kodları (Aynı)
+    function dosyalariYukle(input) {
+      var files = input.files;
+      if (files.length === 0) return;
+
+      document.getElementById('uploadBox').style.display = 'none';
+      document.getElementById('progressArea').style.display = 'block';
+
+      var total = files.length;
+      var count = 0;
+
+      for (var i = 0; i < total; i++) {
+        okuVeGonder(files[i], function() {
+          count++;
+          var yuzde = Math.round((count / total) * 100);
+          document.getElementById('progressFill').style.width = yuzde + "%";
+          document.getElementById('statusCount').innerText = yuzde + "%";
+          document.getElementById('statusMessage').innerText = count + " / " + total + " yüklendi";
+
+          if (count === total) {
+            bitisEfekti();
+          }
+        });
+      }
+    }
+
+    function okuVeGonder(file, callback) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var data = {
+          fileName: file.name,
+          mimeType: file.type,
+          base64: e.target.result.split(',')[1]
+        };
+        google.script.run.withSuccessHandler(callback).uploadFiles(data);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function bitisEfekti() {
+      setTimeout(function() {
+        document.getElementById('progressArea').style.display = 'none';
+        document.getElementById('successArea').style.display = 'block';
+        try {
+          var end = Date.now() + (2 * 1000); 
+          (function frame() {
+            confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#d4af37', '#fdfbfb'] });
+            confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#d4af37', '#fdfbfb'] });
+            if (Date.now() < end) { requestAnimationFrame(frame); }
+          }());
+        } catch(e) {}
+      }, 800);
+    }
+
+    function sifirla() {
+      document.getElementById('successArea').style.display = 'none';
+      document.getElementById('uploadBox').style.display = 'block';
+      document.getElementById('myForm').reset();
+      document.getElementById('progressFill').style.width = "0%";
+      document.getElementById('statusCount').innerText = "0%";
+    }
+  </script>
+</body>
+</html>
