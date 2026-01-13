@@ -244,73 +244,99 @@
   <footer>Hilal & Abdurrahman © 2026</footer>
 
   <script>
-  // --- GÜNCELLENMİŞ JAVASCRIPT KISMI ---
+  <script>
+    // --- BURAYA DİKKAT: KENDİ GOOGLE APPS SCRIPT LINKINI TIRNAKLARIN İÇİNE YAPIŞTIR ---
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyG-9ozehhttr0j1I7WpEZx6cRQe5VS-97tU5bDPTDzjLkYs2k4DV50ic_wYbOsfCYt/exec"; 
 
-   // Senin Web App URL'in (Tırnak içine yapıştır)
-   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyG-9ozehhttr0j1I7WpEZx6cRQe5VS-97tU5bDPTDzjLkYs2k4DV50ic_wYbOsfCYt/exec";
+    // 1. EKSİK OLAN KAPATMA FONKSİYONU (Bunu ekleyince düzelecek)
+    function closeModal() {
+      document.getElementById('infoModal').style.display = 'none';
+    }
 
-   function dosyalariYukle(input) {
-     var files = input.files;
-     if (files.length === 0) return;
+    // 2. DOSYA YÜKLEME FONKSİYONU
+    function dosyalariYukle(input) {
+      var files = input.files;
+      if (files.length === 0) return;
 
-     document.getElementById('uploadBox').style.display = 'none';
-     document.getElementById('progressArea').style.display = 'block';
+      document.getElementById('uploadBox').style.display = 'none';
+      document.getElementById('progressArea').style.display = 'block';
 
-     var total = files.length;
-     var count = 0;
+      var total = files.length;
+      var count = 0;
 
-     // Dosyaları sırayla işle
-     Array.from(files).forEach(file => {
-       okuVeGonder(file, function(basarili) {
-         count++;
-         var yuzde = Math.round((count / total) * 100);
-         
-         // İlerleme çubuğunu güncelle
-         document.getElementById('progressFill').style.width = yuzde + "%";
-         document.getElementById('statusCount').innerText = yuzde + "%";
-         document.getElementById('statusMessage').innerText = count + " / " + total + " yüklendi";
+      // Seçilen tüm dosyaları döngüye al
+      Array.from(files).forEach(file => {
+        okuVeGonder(file, function(basarili) {
+          count++;
+          var yuzde = Math.round((count / total) * 100);
+          
+          document.getElementById('progressFill').style.width = yuzde + "%";
+          document.getElementById('statusCount').innerText = yuzde + "%";
+          document.getElementById('statusMessage').innerText = count + " / " + total + " yüklendi";
 
-         if (count === total) {
-           bitisEfekti();
-         }
-       });
-     });
-   }
+          if (count === total) {
+            bitisEfekti();
+          }
+        });
+      });
+    }
 
-   function okuVeGonder(file, callback) {
-     var reader = new FileReader();
-     reader.onload = function(e) {
-       
-       // Gönderilecek veri paketi
-       var veriPaketi = {
-         fileName: file.name,
-         mimeType: file.type,
-         base64: e.target.result.split(',')[1]
-       };
+    // 3. OKUMA VE GÖNDERME (Fetch Kullanan Yeni Yöntem)
+    function okuVeGonder(file, callback) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        
+        var veriPaketi = {
+          fileName: file.name,
+          mimeType: file.type,
+          base64: e.target.result.split(',')[1]
+        };
 
-       // google.script.run YERİNE fetch kullanıyoruz:
-       fetch(GOOGLE_SCRIPT_URL, {
-         method: "POST",
-         mode: "no-cors", // Google'a veri gönderirken CORS hatası almamak için
-         headers: {
-           "Content-Type": "application/json"
-         },
-         body: JSON.stringify(veriPaketi)
-       })
-       .then(() => {
-         // no-cors modunda yanıt okunamaz ama işlem başarılı varsayılır
-         callback(true);
-       })
-       .catch(error => {
-         console.error("Hata:", error);
-         callback(false); // Yine de devam etsin ki süreç tıkanmasın
-       });
+        // GitHub'dan Google'a veriyi POST ediyoruz
+        fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors", 
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(veriPaketi)
+        })
+        .then(() => {
+          callback(true);
+        })
+        .catch(error => {
+          console.error("Hata:", error);
+          callback(false);
+        });
 
-     };
-     reader.readAsDataURL(file);
-   }
+      };
+      reader.readAsDataURL(file);
+    }
 
-   // Diğer fonksiyonlar (bitisEfekti, sifirla, closeModal) aynı kalabilir.
+    // 4. KONFETİ EFEKTİ (Eksikse bu da çalışmazdı)
+    function bitisEfekti() {
+      setTimeout(function() {
+        document.getElementById('progressArea').style.display = 'none';
+        document.getElementById('successArea').style.display = 'block';
+        try {
+          var end = Date.now() + (2 * 1000); 
+          (function frame() {
+            confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#d4af37', '#fdfbfb'] });
+            confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#d4af37', '#fdfbfb'] });
+            if (Date.now() < end) { requestAnimationFrame(frame); }
+          }());
+        } catch(e) {}
+      }, 800);
+    }
+
+    // 5. BAŞA DÖNME FONKSİYONU
+    function sifirla() {
+      document.getElementById('successArea').style.display = 'none';
+      document.getElementById('uploadBox').style.display = 'block';
+      document.getElementById('myForm').reset();
+      document.getElementById('progressFill').style.width = "0%";
+      document.getElementById('statusCount').innerText = "0%";
+    }
+  </script>
   </script>
 </body>
 </html>
+
